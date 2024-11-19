@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import CryptoJS from "crypto-js";
 
 // Update this to match your backend URL
-const socket = io("https://myflaskapp.up.railway.app", {
+const socket = io("https://myflaskapp-production-feca.up.railway.app", {
   transports: ["websocket"],
 });
 
