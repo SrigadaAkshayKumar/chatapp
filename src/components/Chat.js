@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import CryptoJS from "crypto-js";
 
-const socket = io("https://myflaskapp.up.railway.app");
+// Update this to match your backend URL
+const socket = io("https://myflaskapp.up.railway.app", {
+  transports: ["websocket"],
+});
 
 const Chat = () => {
   const [userId, setUserId] = useState("");
@@ -13,7 +16,6 @@ const Chat = () => {
   const [receivedMessages, setReceivedMessages] = useState([]);
   const [decryptedMessages, setDecryptedMessages] = useState({});
 
-  // Register user ID on the server
   const registerUser = () => {
     if (userId) {
       socket.emit("register", { userId });
@@ -23,7 +25,6 @@ const Chat = () => {
     }
   };
 
-  // Handle message encryption and sending
   const encryptAndSendMessage = () => {
     if (message && encryptionPasskey && recipientId) {
       const encrypted = CryptoJS.AES.encrypt(
@@ -44,7 +45,6 @@ const Chat = () => {
     }
   };
 
-  // Handle message decryption
   const decryptMessage = (encrypted, index) => {
     if (decryptionPasskey) {
       try {
@@ -65,7 +65,6 @@ const Chat = () => {
     }
   };
 
-  // Listen for incoming messages
   useEffect(() => {
     socket.on("receiveMessage", (data) => {
       setReceivedMessages((prev) => [...prev, data]);
@@ -78,7 +77,6 @@ const Chat = () => {
     <div className="chat-container">
       <h1 className="chat-title">Secure Chat</h1>
 
-      {/* Register User Section */}
       <div className="section">
         <h2>Register</h2>
         <input
@@ -92,7 +90,6 @@ const Chat = () => {
         </button>
       </div>
 
-      {/* Sender Section */}
       <div className="section">
         <h2>Send a Message</h2>
         <textarea
@@ -118,7 +115,6 @@ const Chat = () => {
         </button>
       </div>
 
-      {/* Received Messages Section */}
       <div className="section">
         <h2>Received Messages</h2>
         {receivedMessages.map((msg, index) => (
