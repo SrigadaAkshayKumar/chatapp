@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import CryptoJS from "crypto-js";
 
-const socket = io("http://192.168.1.25:5000");
+const socket = io("http://akshayak8.pythonanywhere.com");
 
 const Chat = () => {
   const [userId, setUserId] = useState("");
