@@ -4,7 +4,7 @@ import CryptoJS from "crypto-js";
 
 // Update this to match your backend URL
 const socket = io("https://myflaskapp-production-feca.up.railway.app", {
-  transports: ["websocket"],
+  transports: ["websocket", "polling"],
 });
 
 const Chat = () => {
@@ -15,6 +15,20 @@ const Chat = () => {
   const [decryptionPasskey, setDecryptionPasskey] = useState("");
   const [receivedMessages, setReceivedMessages] = useState([]);
   const [decryptedMessages, setDecryptedMessages] = useState({});
+
+  useEffect(() => {
+    // Log socket connection status
+    socket.on("connect", () => console.log("Socket connected to backend"));
+    socket.on("connect_error", (err) =>
+      console.error("Socket connection error:", err)
+    );
+
+    socket.on("receiveMessage", (data) => {
+      setReceivedMessages((prev) => [...prev, data]);
+    });
+
+    return () => socket.disconnect();
+  }, []);
 
   const registerUser = () => {
     if (userId) {
@@ -36,7 +50,7 @@ const Chat = () => {
         recipientId,
         encryptedMessage: encrypted,
       });
-      setMessage(""); // Clear the message input
+      setMessage("");
       console.log(`Message sent to ${recipientId}`);
     } else {
       alert(
@@ -65,18 +79,9 @@ const Chat = () => {
     }
   };
 
-  useEffect(() => {
-    socket.on("receiveMessage", (data) => {
-      setReceivedMessages((prev) => [...prev, data]);
-    });
-
-    return () => socket.off("receiveMessage");
-  }, []);
-
   return (
     <div className="chat-container">
       <h1 className="chat-title">Secure Chat</h1>
-
       <div className="section">
         <h2>Register</h2>
         <input
@@ -89,7 +94,6 @@ const Chat = () => {
           Register
         </button>
       </div>
-
       <div className="section">
         <h2>Send a Message</h2>
         <textarea
@@ -114,7 +118,6 @@ const Chat = () => {
           Send Encrypted Message
         </button>
       </div>
-
       <div className="section">
         <h2>Received Messages</h2>
         {receivedMessages.map((msg, index) => (
